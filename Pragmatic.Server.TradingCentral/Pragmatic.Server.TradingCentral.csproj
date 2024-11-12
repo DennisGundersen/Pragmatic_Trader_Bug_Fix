@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+	<OutputType>Exe</OutputType>
+	<TargetFramework>net8.0</TargetFramework>
+	<ImplicitUsings>disable</ImplicitUsings>
+	<Nullable>disable</Nullable>
+	<AssemblyName>TradingCentral</AssemblyName>
+</PropertyGroup>
+
+<ItemGroup>
+  <Compile Remove="MQL\**" />
+  <EmbeddedResource Remove="MQL\**" />
+  <None Remove="MQL\**" />
+</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.2.2" />
+    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.2.2" />
+    <PackageReference Include="NetMQ" Version="4.0.1.13" />
+  </ItemGroup>
+
+<ItemGroup>
+	<ProjectReference Include="..\Pragmatic.Common.Enums\Pragmatic.Common.Enums.csproj" />
+	<ProjectReference Include="..\Pragmatic.Common.Models\Pragmatic.Common.Models.csproj" />
+
+	<!--ProjectReference Include="..\Pragmatic.Core.Services\Pragmatic.Core.Services.csproj" /-->
+	<!--ProjectReference Include="..\Pragmatic.Strategy.Hourglass.BusinessLogic\Pragmatic.Strategy.Hourglass.BusinessLogic.csproj" /-->
+</ItemGroup>
+
+<ItemGroup>
+  <Compile Update="Properties\Resources.Designer.cs">
+    <DesignTime>True</DesignTime>
+    <AutoGen>True</AutoGen>
+    <DependentUpon>Resources.resx</DependentUpon>
+  </Compile>
+</ItemGroup>
+
+<ItemGroup>
+  <EmbeddedResource Update="Properties\Resources.resx">
+    <Generator>ResXFileCodeGenerator</Generator>
+    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+  </EmbeddedResource>
+</ItemGroup>
+
+<ItemGroup>
+  <None Update="Installation.txt">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="MQL to ZeroMQ bug.txt">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
+
+</Project>

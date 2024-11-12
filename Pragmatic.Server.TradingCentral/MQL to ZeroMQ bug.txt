@@ -1,0 +1,12 @@
+EA starts OK, but when timefrane is changed, OnInit() will trigger and start a cascade of errors:
+
+2024.11.12 16:28:52.062	HourglassTraderMQ_BugFix USDJPYi,Daily: RegisterHourglassAccount no response - error: `Frame not received - last #0`
+
+2024.11.12 16:28:52.063	HourglassTraderMQ_BugFix USDJPYi,Daily: Trader successfully registered AccountId 1 with server. Last order close at 1970.01.01 00:00:00.
+
+2024.11.12 16:29:04.329	HourglassTraderMQ_BugFix USDJPYi,Daily: RegisterHourglassTrades no response - error: `Frame not received - last #0`
+
+2024.11.12 16:29:04.329	HourglassTraderMQ_BugFix USDJPYi,Daily: RegisterHourglassTradesOnServer error
+
+repeating two last lines
+

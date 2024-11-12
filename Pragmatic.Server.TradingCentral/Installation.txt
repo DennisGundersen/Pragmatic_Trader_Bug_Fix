@@ -1,0 +1,9 @@
+﻿The TradingCentral project is dependant on the machine having the following installed:
+dotnet-runtime-8.0.5-win-x64.exe
+aspnetcore-runtime-8.0.0-win-x64.exe
+
+In addition, MT4 need to load the include/ZMQ files, which depends on the Microsoft Visual C++ Redistributable Version (x86 due to MT4).
+
+ZeroMQ is located at https://zeromq.org/.
+The MQL (MT4) to ZeroMQ bridge is located at https://github.com/dingmaotu/mql4-lib
+
