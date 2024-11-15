@@ -115,8 +115,8 @@ namespace Pragmatic.Server.TradingCentral
 					 {
 						  { "RegisterHourglassAccount", commands.RegisterHourglassAccount },
 						  { "RegisterHourglassTrades", commands.RegisterHourglassTrades },
-						  //{ "RegisterClosedTrades", commands.RegisterClosedTrades },
-						  //{ "GetHourglassAccountOverview", commands.GetHourglassAccountOverview },
+						  { "RegisterClosedTrades", commands.RegisterClosedTrades },
+						  { "GetHourglassAccountOverview", commands.GetHourglassAccountOverview },
 						  //{ "RunUpdaterTesting", commands.RunUpdaterTesting }
 					 };
 

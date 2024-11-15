@@ -165,78 +165,123 @@ namespace Pragmatic.Server.TradingCentral
 		public string[] RegisterClosedTrades(string[] args)
 		{
 
-			//try
-			//{
-			//	bool success = false;
-			//	int currentPosition = 0;
-			//	//Console.WriteLine("RegisterClosedTrades() called");
+			try
+			{
+				bool success = false;
+				int currentPosition = 0;
+				//Console.WriteLine("RegisterClosedTrades() called");
 
-			//	// Deserialize the incoming string[] args into a List<OrderDTO>
-			//	List<OrderModel> ordersList = new();
-			//	success = conv.ArrayToListOfOrderModel(args, ref currentPosition, ref ordersList);
+				// Deserialize the incoming string[] args into a List<OrderDTO>
+				List<OrderModel> ordersList = new();
+				success = conv.ArrayToListOfOrderModel(args, ref currentPosition, ref ordersList);
 
-			//	// If the incoming string object couldn't be deserialized, return an error
-			//	if (!success)
-			//	{
-			//		return PrepareError(string.Format("Argument 0 ordersList({0}) couldn't be parsed as {1}", args[0], "Pragmatic.Common.ZMQTypes.DynamicArray<Pragmatic.Common.Entities.OrderDTO>"));
-			//	}
+				// If the incoming string object couldn't be deserialized, return an error
+				if (!success)
+				{
+					return PrepareError(string.Format("Argument 0 ordersList({0}) couldn't be parsed as {1}", args[0], "Pragmatic.Common.ZMQTypes.DynamicArray<Pragmatic.Common.Entities.OrderDTO>"));
+				}
 
-			//	// Call the method on the BusinessLogic class, passing the deserialized string[] as a List<OrderDTO>, and receive the resulting ApiResultDTO
-			//	Task<bool> task = Task.Run(async () => await trader.RegisterClosedTrades(ordersList));
+				// Call the method on the BusinessLogic class, passing the deserialized string[] as a List<OrderDTO>, and receive the resulting ApiResultDTO
+				//Task<bool> task = Task.Run(async () => await trader.RegisterClosedTrades(ordersList));
 
-			//	// Serialize the resulting List<ChangeOrderModel> to a string[], including a prepended "OK" status code, then return it
-			//	string[] results = PrepareResponse(conv.BoolToListOfString(task.Result).ToArray());
+				// Serialize the resulting List<ChangeOrderModel> to a string[], including a prepended "OK" status code, then return it
+				//string[] results = PrepareResponse(conv.BoolToListOfString(task.Result).ToArray());
 
-			//	return results;
-			//}
-			//catch (Exception ex)
-			//{
-			//	logger?.LogError(ex, $"MethodAdapters.RegisterClosedTrades exception: {0}", ex.Message);
-			//	throw new Exception("MethodAdapters.RegisterClosedTrades exception", ex);
-			//}
+				// Dummy data
+				string[] results = PrepareResponse(conv.BoolToListOfString(true).ToArray());
 
-			return new string[] { "OK", "true" };
+				return results;
+			}
+			catch (Exception ex)
+			{
+				logger?.LogError(ex, $"MethodAdapters.RegisterClosedTrades exception: {0}", ex.Message);
+				throw new Exception("MethodAdapters.RegisterClosedTrades exception", ex);
+			}
+
+			//return new string[] { "OK", "true" };
 		}
 
 		public string[] GetHourglassAccountOverview(string[] args)
 		{
 
-			//bool success = false;
+			bool success = false;
 
-			//// Create blank HourglassAccountStatisticsDTO object
-			//StatisticsModel statisticsModel = new();
+			// Create blank HourglassAccountStatisticsDTO object
+			StatisticsModel statisticsModel = new();
 
-			//// Incoming args[0] should be the accountId
-			//int valInt;
-			//int accountId = 0;
-			//try
-			//{
-			//	success = int.TryParse(args[0], out valInt);
-			//	if (!success) return null;
-			//	accountId = valInt;
-			//}
-			//catch (Exception ex)
-			//{
-			//	logger?.LogError(ex, $"MethodAdapters.GetHourglassAccountOverview AccountId exception: {0}", ex.Message);
-			//	throw new Exception("MethodAdapters.GetHourglassAccountOverview AccountId exception", ex);
-			//}
+			// Incoming args[0] should be the accountId
+			int valInt;
+			int accountId = 0;
+			try
+			{
+				success = int.TryParse(args[0], out valInt);
+				if (!success) return null;
+				accountId = valInt;
+			}
+			catch (Exception ex)
+			{
+				logger?.LogError(ex, $"MethodAdapters.GetHourglassAccountOverview AccountId exception: {0}", ex.Message);
+				throw new Exception("MethodAdapters.GetHourglassAccountOverview AccountId exception", ex);
+			}
 
-			//try
-			//{
-			//	// Call the method in the BusinessLogic class, passing accountId, and receive the resulting HourglassAccountStatisticsDTO
-			//	StatisticsModel result = trader.GetAccountOverview();
+			try
+			{
+				// Call the method in the BusinessLogic class, passing accountId, and receive the resulting HourglassAccountStatisticsDTO
+				//statisticsModel = trader.GetAccountOverview();
 
-			//	// Serialize the resulting HourglassAccountStatisticsModel into a string[], including a prepended "OK" status code, then return it
-			//	string[] retSerialized = PrepareResponse(conv.HourglassAccountStatisticsModelToListOfString(result).ToArray());
+				// Dummy data
+				statisticsModel.AccountId = 1;
+				statisticsModel.Longs = 0.01m;
+				statisticsModel.Shorts = 0.01m;
+				statisticsModel.LongBalancers = 0.01m;
+				statisticsModel.ShortBalancers = 0.01m;
+				statisticsModel.CurrentStep = 10;
+				statisticsModel.NextLotSize = 0.02m;
+				statisticsModel.NextLotIncrease = 2000.54m;
+				statisticsModel.NextLotIncreaseOrders = 123;
+				statisticsModel.OrderCount = 20;
 
-			//	return retSerialized;
-			//}
-			//catch (Exception ex)
-			//{
-			//	logger?.LogError(ex, $"MethodAdapters.GetAccountOverview exception: {0}", ex.Message);
-			//	throw new Exception("MethodAdapters.GetAccountOverview exception", ex);
-			//}
-			return new string[] { "OK", "true" };
+				statisticsModel.TopRate = 4.000m;
+				statisticsModel.TopEquity = 2000m;
+				statisticsModel.TopBalance = 2000m;
+				statisticsModel.TopLongs = 0.05m;
+				statisticsModel.TopShorts = 0.05m;
+
+				statisticsModel.UpRate = 4.000m;
+				statisticsModel.UpEquity = 2000m;
+				statisticsModel.UpBalance = 2000m;
+				statisticsModel.UpLongs = 0.05m;
+				statisticsModel.UpShorts = 0.05m;
+
+				statisticsModel.CenterRate = 4.000m;
+				statisticsModel.CenterEquity = 2000m;
+				statisticsModel.CenterBalance = 2000m;
+				statisticsModel.CenterLongs = 0.05m;
+				statisticsModel.CenterShorts = 0.05m;
+				
+				statisticsModel.DownRate = 4.000m;
+				statisticsModel.DownEquity = 2000m;
+				statisticsModel.DownBalance = 2000m;
+				statisticsModel.DownLongs = 0.05m;
+				statisticsModel.DownShorts = 0.05m;
+
+				statisticsModel.BottomRate = 4.000m;
+				statisticsModel.BottomEquity = 2000m;
+				statisticsModel.BottomBalance = 2000m;
+				statisticsModel.BottomLongs = 0.05m;
+				statisticsModel.BottomShorts = 0.05m;
+				
+				// Serialize the resulting StatisticsModel into a string[], including a prepended "OK" status code, then return it
+				string[] retSerialized = PrepareResponse(conv.HourglassAccountStatisticsModelToListOfString(statisticsModel).ToArray());
+
+				return retSerialized;
+			}
+			catch (Exception ex)
+			{
+				logger?.LogError(ex, $"MethodAdapters.GetAccountOverview exception: {0}", ex.Message);
+				throw new Exception("MethodAdapters.GetAccountOverview exception", ex);
+			}
+			//return new string[] { "OK", "true" };
 		}
 
 		public string[] RunUpdaterTesting(string[] args)

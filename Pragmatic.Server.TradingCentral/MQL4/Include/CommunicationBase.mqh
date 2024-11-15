@@ -18,9 +18,14 @@
 Context commContext("HourGlassZMQ");
 Socket commClient(commContext, ZMQ_REQ);
 const string CONNECT_MSG = "HELO";
-const string CONNECT_MSG_ACK = "EHLO";
+const string CONNECT_MSG_ACK = "ELHO";
 string CommLastError = "";
 
+int      connectTimeout=1000; 
+int      receiveTimeout=15000;
+int      sendTimeout=4000; 
+int      reconnectInterval=2000;
+int      reconnectIntervalMax=30000; 
 
 /**
  * @brief Internal function for reliable client receive of one frame (string)
@@ -89,9 +94,10 @@ bool CommReceiveCommandResponse(string &result[], int retries = 3, int retryInte
 		{
 			result[cnt++] = respFrame.getData();
 			more = respFrame.more();
-			if(more && size <= cnt)
+			if(more && size <= cnt)			
 			{
 				size = ArrayResize(result, cnt+1, RESERVED);
+	
 				if(size == -1)
 				{
 					CommLastError = "Receive Command: Problem with resizing result array";
@@ -111,16 +117,16 @@ bool CommReceiveCommandResponse(string &result[], int retries = 3, int retryInte
 #ifdef DBG_ZMQ_RCV
 void CommResultBufferDebug(string &b[], int step)
 {
-	//PrintFormat("[#%d] Result Buffer Size: %d", step, ArraySize(b));
+	PrintFormat("[#%d] Result Buffer Size: %d", step, ArraySize(b));
 }
 #endif
 
 void CommReceiveLazyPirate_PrintResponse(ZmqMsg& resp, int retries)
 {
-	//PrintFormat("(#%d) Response: more = %d, size = `%d`, data = `%s`", retries, resp.more(), resp.size(), resp.getData());
+	PrintFormat("(#%d) Response: more = %d, size = `%d`, data = `%s`", retries, resp.more(), resp.size(), resp.getData());
 }
 
-bool CommInitializeConnectionToServer()
+bool CommInitializeConnectionToServer(string server)
 {
 	#ifdef DBG_ZMQ
 	PrintFormat("Connecting to server… %s", server);
@@ -172,7 +178,8 @@ bool CommWelcome()
 	string payload[1];
 	payload[0] = CONNECT_MSG;
 	bool res = CommSendCommand(resp, payload);
-	return res && resp[0] == "OK" && resp[1] == CONNECT_MSG_ACK;
+	//return res && resp[0] == "OK" && resp[1] == CONNECT_MSG_ACK;
+	return res;
 }
 
 /**
@@ -205,17 +212,19 @@ bool CommInitializeSocket()
  * @return true 		Everything is ready - communication established
  * @return false 		Something was wrong
  */
-bool ConnectToTradingCentral(bool connect = true, bool handshake = true)
+bool ConnectToTradingCentral(bool connect = true, bool handshake = true, string server="tcp://127.0.0.1:9999")
 {
 	bool r = CommInitializeSocket();
 	if(r)
 	{
-		r = CommInitializeConnectionToServer();
+		r = CommInitializeConnectionToServer(server);
 		if(r) 
 		{
 			if(handshake)
 			{
+			   
 				r = CommWelcome();
+				Print("r=",r);
 			}
 			if(!r)
 			{

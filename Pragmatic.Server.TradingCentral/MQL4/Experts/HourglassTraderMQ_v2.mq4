@@ -1,11 +1,11 @@
 //+------------------------------------------------------------------+
-//|                                           HourglassTrader_v1.mq4 |
+//|                                         HourglassTraderMQ_v2.mq4 |
 //|                                              Dennis Gundersen AS |
 //|                                  https://www.dennisgundersen.com |
 //+------------------------------------------------------------------+
 #property copyright "Dennis Gundersen AS"
 #property link      "https://www.dennisgundersen.com"
-#property version   "1.01"
+#property version   "2.00"
 //uncomment to Print Debug information related to ZeroMQ communication
 //#define DBG_ZMQ
 //for debugging multiframe receive
@@ -22,11 +22,7 @@
 extern string ConnectionPort = "9999";
 string   server="tcp://127.0.0.1:";
 //Those give advanced options over socket - could be also not input
-int      connectTimeout=1000; 
-int      receiveTimeout=3000;
-int      sendTimeout=4000; 
-int      reconnectInterval=2000;
-int      reconnectIntervalMax=30000; 
+
 
 
 extern string  TradingVariables = "------------------------------------------";
@@ -50,22 +46,22 @@ extern int	   ShortStabilizerSizeFactor = 0;
 extern int     LongBalancerSizeFactor = 0;        
 extern int     ShortBalancerSizeFactor = 0;       
 extern int     PrimerSizeFactor = 3;			   
-extern int		BalancerMinPlacementDistanceLongs = 100;
-extern int		BalancerMinPlacementDistanceShorts = 100;
+extern int	   BalancerMinPlacementDistanceLongs = 100;
+extern int	   BalancerMinPlacementDistanceShorts = 100;
 extern int     BalancerStopLossPips = 100;         
 extern int     SecurePips = 0;                    
 extern bool    RunBalancers = false;              
 extern bool    RunStabilizers = false;             
 extern bool    RunBreakouts = false;              
 extern bool    RunPrimers = true;                 
-extern bool    AutoCloseExtremes = false;          
-extern bool    RunWhiplash = false;                 
+bool    AutoCloseExtremes = false;          
+bool    RunWhiplash = false;                 
 
 extern string  SystemVariables = "------------------------------------------";
 extern string  NameOfAccount = "DEV";          
 extern bool	   IsAccountMaster = true;			   
 extern bool    IsSymbolMaster = true;       
-extern double  AccountPercentage = 1.00;    
+double  AccountPercentage = 1.00;    
 extern int     HeartbeatMonitorTimer = 5;   
 extern int     SnapshotLogTimer = 5;        
 extern int     UpdateHistoryTimer = 5;            
@@ -140,11 +136,11 @@ double         currentSpread = 0;
 double         maxSpread = 0;
 bool           isAccountRegistered = false;
 
-double			top = 0;
-double			bottom = 0;
-double			gridSize = 0;
-double			gridTopRefreshRate = 0;
-double			gridBottomRefreshRate = 0;
+double		   top = 0;
+double		   bottom = 0;
+double		   gridSize = 0;
+double		   gridTopRefreshRate = 0;
+double		   gridBottomRefreshRate = 0;
 double         oldAccountbalance;
 double         gridTopRate = 0;
 double         gridBottomRate = 0;
@@ -171,17 +167,23 @@ int OnInit()
    timeScreenshot = TimeCurrent();                 // Timer for last screenshot
    timeStatistics = 0;                             // Timer for last UI update
    timeHistory = TimeCurrent();                    // Timer for last history check
+   
+   //
+   EventSetTimer(10);
 
    if(ConnectToTradingCentral())
    {
          isAccountRegistered = RegisterHourglassAccountOnServer();
-         return(INIT_SUCCEEDED);
+         Print("isAccountRegistered after connect: ", isAccountRegistered);
+         if(isAccountRegistered) return(INIT_SUCCEEDED);
    }
    else
    {
       Print("Communication problem: " + CommLastError);
    }
-   return INIT_FAILED;
+   //if(isAccountRegistered==false) return INIT_FAILED;
+   Print("isAccountRegistered: ", isAccountRegistered);
+   return(INIT_SUCCEEDED);
 }
 
 
@@ -197,12 +199,12 @@ void OnTick()
    if(isAccountRegistered && account.accountId > 0)
    {
       RunTrader();
-      //UpdateStatistics();
-      //SoundFeedback();
+      UpdateStatistics();
+      SoundFeedback();
       if(IsTrader)
       {
-         //UpdateHistory();
-         //SaveChart();
+         UpdateHistory();
+         SaveChart();
       }
    }
    else // If not registered, retry login every 10 seconds
@@ -215,11 +217,29 @@ void OnTick()
 }
 
 
-
+void OnTimer()
+  {
+/*/---
+   bool r;
+  	string payload[5];    //send buffer
+	string response[5];   //response buffer
+	payload[0]="This";
+   payload[1]="is";
+   payload[2]="bag";
+   r = CommSendCommand(response, payload);
+   Print("r=",r);
+   Print("response[0]=",response[0]);
+   Print("response[1]=",response[1]);
+   Print("response[2]=",response[2]);
+   Print("response[3]=",response[3]);
+*/   
+  }
+  
+  
 // Collect all account and trading variables, check account in dbs, and register last closed order
 bool RegisterHourglassAccountOnServer()
 {
-   HourglassAccountRegistrationDTO registrationDTO;      // Instantiation of outgoing variables as class
+    HourglassAccountRegistrationDTO registrationDTO;      // Instantiation of outgoing variables as class
 	FillHourglassAccountRegistrationDTO(registrationDTO); // Collect data and fill in all the variables
 	HourglassAccountRegistrationResultDTO resultDTO;      // Instantiation of incoming result as class
 
@@ -261,9 +281,9 @@ bool RegisterHourglassAccountOnServer()
 			   {
 				   account.accountId = resultDTO.accountId;
 				   account.lastOrderClose = resultDTO.lastOrderClose;
-               PrintFormat("Trader successfully registered AccountId %s with server. Last order close at %s.", 
-                     IntegerToString(account.accountId), 
-                     TimeToString(IntToDateTime(account.lastOrderClose), TIME_DATE|TIME_MINUTES|TIME_SECONDS));
+                   PrintFormat("Trader successfully registered AccountId %s with server. Last order close at %s.", 
+                            IntegerToString(account.accountId), 
+                            TimeToString(IntToDateTime(account.lastOrderClose), TIME_DATE|TIME_MINUTES|TIME_SECONDS));
 				   account.startFactor = resultDTO.startFactor;
 				   account.startingBalance = resultDTO.startingBalance;
 				   account.stepGrowthFactor = resultDTO.stepGrowthFactor;
@@ -315,7 +335,7 @@ int RunTrader()
          }
 		}
    
-     // PrintFormat("Calling RegisterHourglassTradesOnServer(changeOrders, orders, ask, bid, balance, equity)");
+        //PrintFormat("Calling RegisterHourglassTradesOnServer(changeOrders, orders, ask, bid, balance, equity)");
 		bool ok = RegisterHourglassTradesOnServer(changeOrders, orders, Ask, Bid, AccountBalance(), AccountEquity());
 		if(ok)
 		{
